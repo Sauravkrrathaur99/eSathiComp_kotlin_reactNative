@@ -4,10 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { Ionicons } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 const { width, height } = Dimensions.get('window');
+import NetInfo from '@react-native-community/netinfo';
 
 export default function MainScreen({ internetStatus }) { // Receive internetStatus as a prop
   const [userName, setUserName] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [connectionType, setConnectionType] = useState('Checking network...');
 
   useEffect(() => {
     const loadUserName = async () => {
@@ -28,6 +30,23 @@ export default function MainScreen({ internetStatus }) { // Receive internetStat
   useEffect(() => {
     console.log('Rendering MainScreen with userName:', userName ? userName : 'null/undefined');
   }, [userName]);
+
+  useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        if (!state.isConnected) {
+          setConnectionType('No Internet Connection');
+        } else if (state.type === 'wifi') {
+          setConnectionType('Connected via WiFi');
+        } else if (state.type === 'cellular') {
+          setConnectionType('Connected via Mobile Data');
+        } else {
+          setConnectionType('Connected');
+        }
+      });
+      return () => {
+        unsubscribe();
+      };
+    }, []);
 
   const actions = [
     { id: '1', title: 'Action 1', icon: require('./assets/images/set_location_attendance.png') },
@@ -75,10 +94,10 @@ export default function MainScreen({ internetStatus }) { // Receive internetStat
           </View>
 
           <View style={[styles.InternetinfoContainer, { marginTop: height * 0.001 }]}>
-            <View style={styles.InternetinfoRow}>
-              <Text style={styles.internetStatus}>{internetStatus}</Text>
-            </View>
-          </View>
+                      <View style={styles.InternetinfoRow}>
+                        <Text style={styles.internetStatus}>{connectionType}</Text>
+                      </View>
+                    </View>
 
           <View style={styles.actionsContainer}>
             {actions.map((action) => (
