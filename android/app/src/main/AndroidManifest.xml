@@ -3,6 +3,7 @@
     package="com.esathicomp">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- Foreground Service permission -->
@@ -40,7 +41,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <data android:scheme="${appAuthRedirectScheme}" />  <!-- this is the placeholder replacement -->
+<!--                <data android:scheme="${appAuthRedirectScheme}" />  &lt;!&ndash; this is the placeholder replacement &ndash;&gt;-->
             </intent-filter>
 
         </activity>

@@ -104,20 +104,27 @@ const LoginScreen = () => {
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="light-content" backgroundColor="#2C3E50" />
         <View style={styles.container}>
-          {/* Background circles or extra design can be added here similarly if desired */}
-          <Text style={styles.welcomeText}>Your Companion eSathi!</Text>
-
+          {/* App Name and Tagline centered above button */}
+          <View style={{ alignItems: 'center', marginBottom: 32 }}>
+            <Text style={styles.title}>
+              eSathi-Onelogica
+            </Text>
+            <Text style={styles.subtitle}>
+              Your Smart Companion App
+            </Text>
+          </View>
+          {/* Sign in with Microsoft button */}
           <TouchableOpacity style={styles.signInButton} onPress={handleLogin} disabled={loading}>
             <Image source={msIcon} style={styles.microsoftLogo} />
             <Text style={styles.signInButtonText}>
               {loading ? 'Signing in...' : 'Sign in with Microsoft'}
             </Text>
           </TouchableOpacity>
-
           {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
         </View>
       </SafeAreaView>
     </ImageBackground>
+
   );
 };
 
@@ -142,6 +149,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
     marginBottom: 30,
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 24,
   },
   signInButton: {
     flexDirection: 'row',

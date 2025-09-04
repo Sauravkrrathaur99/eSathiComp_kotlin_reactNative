@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, SafeAreaView, StatusBar, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, SafeAreaView, StatusBar, ScrollView, Image, Platform, PermissionsAndroid, } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { Ionicons } from '@expo/vector-icons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 const { width, height } = Dimensions.get('window');
 import NetInfo from '@react-native-community/netinfo';
+import WifiManager from "react-native-wifi-reborn";
+console.log('WifiManager:', WifiManager);
+
+
 
 export default function MainScreen({ internetStatus }) { // Receive internetStatus as a prop
   const [userName, setUserName] = useState(null);
@@ -32,20 +36,50 @@ export default function MainScreen({ internetStatus }) { // Receive internetStat
   }, [userName]);
 
   useEffect(() => {
+      const getWifiSSID = async () => {
+          console.log('inside the getWifiSSID');
+        if (Platform.OS === 'android') {
+            console.log("inside the platform android");
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+              title: 'Location Permission Required',
+              message: 'Location permission is needed to get WiFi SSID',
+              buttonPositive: 'OK',
+            }
+          );
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            setConnectionType('Location permission denied');
+            return;
+          }
+        }
+        try {
+          const ssid = await WifiManager.getCurrentWifiSSID();
+          console.log('ssid', ssid);
+          // Map SSID to custom friendly names
+          if (ssid.includes('JioFiber-1926-4G')) setConnectionType('Connected via Onlogica');
+          else if (ssid.includes('Mishitech4G')) setConnectionType('Connected via MishiTech');
+          else if (ssid.includes('Airtel_kmsa_9818')) setConnectionType('Connected via GolfHomes');
+          else setConnectionType(`Connected via ${ssid}`);
+        } catch (error) {
+            console.warn('Could not get SSID', error); // See the reason in your logcat
+          setConnectionType('Connected via WiFi');
+        }
+      };
+
       const unsubscribe = NetInfo.addEventListener((state) => {
         if (!state.isConnected) {
           setConnectionType('No Internet Connection');
         } else if (state.type === 'wifi') {
-          setConnectionType('Connected via WiFi');
+          getWifiSSID();
         } else if (state.type === 'cellular') {
           setConnectionType('Connected via Mobile Data');
         } else {
           setConnectionType('Connected');
         }
       });
-      return () => {
-        unsubscribe();
-      };
+
+      return () => unsubscribe();
     }, []);
 
   const actions = [
@@ -96,6 +130,7 @@ export default function MainScreen({ internetStatus }) { // Receive internetStat
           <View style={[styles.InternetinfoContainer, { marginTop: height * 0.001 }]}>
                       <View style={styles.InternetinfoRow}>
                         <Text style={styles.internetStatus}>{connectionType}</Text>
+
                       </View>
                     </View>
 
